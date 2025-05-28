@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: api-performace
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus  # Kích hoạt các endpoint Actuator cần thiết
+      base-path: /metrics  # Đặt đường dẫn cơ sở cho tất cả các endpoints Actuator
+
+  health:
+    status:
+      http-mapping:
+        DOWN: 503
+        OUT_OF_SERVICE: 503
+        UNKNOWN: 500
