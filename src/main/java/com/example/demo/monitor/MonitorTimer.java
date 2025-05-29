@@ -1,5 +1,9 @@
 package com.example.demo.monitor;
 
+import com.example.demo.actuator.Actuator;
+import io.micrometer.core.instrument.Counter;
+
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -30,12 +34,17 @@ public class MonitorTimer {
     private static final int TEST_DURATION_SECONDS = 30000;
     private static final String API_URL = "http://localhost:8080/api/test";
 
-    public static void main(String[] args) {
+    public static final Actuator actuator = Actuator.getInstance("produce-request");
+    public static void main(String[] args) throws IOException {
+        actuator.start(8081);
+        Counter counter =  Actuator.getPrometheusMeterRegistry().counter("produce_request_counter",
+                "endpoint", "/api/test");
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(TARGET_TPS);
 
         Runnable sendRequest = () -> {
             try {
                 HttpURLConnection connection = (HttpURLConnection) new URL(API_URL).openConnection();
+                counter.increment();
                 connection.setRequestMethod("GET");
                 int responseCode = connection.getResponseCode();
                 System.out.println("Response: " + responseCode);
@@ -45,10 +54,11 @@ public class MonitorTimer {
             }
         };
 
-        long period = 1000L / TARGET_TPS; // milliseconds between requests per thread
+        long period = 1000L / TARGET_TPS;
 
         for (int i = 0; i < TARGET_TPS; i++) {
             scheduler.scheduleAtFixedRate(sendRequest, i * period, 1000, TimeUnit.MILLISECONDS);
+
         }
 
         // Stop after the test duration
