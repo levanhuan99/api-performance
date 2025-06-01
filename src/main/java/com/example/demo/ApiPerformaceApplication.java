@@ -4,6 +4,9 @@ package com.example.demo;
 //import com.example.demo.monitor.MonitorTimer;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class ApiPerformaceApplication {
+	private static final Logger logger = LoggerFactory.getLogger(ApiPerformaceApplication.class);
 	@Bean
 	public MeterRegistry meterRegistry() {
 		return new SimpleMeterRegistry();
@@ -18,6 +22,7 @@ public class ApiPerformaceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApiPerformaceApplication.class, args);
+		logger.info("Application started successfully");
 	}
 //
 //	@Bean
